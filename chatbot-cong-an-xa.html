@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trợ lý Hành chính Công an Xã</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ==== THAY DÒNG NÀY ==== */
+  :root { --worker-url: "https://patient-darkness-6124.stickdeal.workers.dev/"; }
+  /* ======================== */
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Be Vietnam Pro',sans-serif;background:#f4f6fa;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:12px}
+  .app{width:100%;max-width:780px;height:calc(100vh - 24px);min-height:500px;display:flex;flex-direction:column;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(26,39,66,.10);overflow:hidden}
+  .hd{display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(135deg,#1a2742,#2e3f67);flex-shrink:0}
+  .hd-icon{width:42px;height:42px;background:#d4a017;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .hd-t{color:#fff;font-size:15px;font-weight:700}
+  .hd-s{color:#d4a017;font-size:11.5px;margin-top:2px;display:flex;align-items:center;gap:5px}
+  .dot{width:7px;height:7px;background:#4ade80;border-radius:50%;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .chips{display:flex;gap:7px;padding:9px 14px;overflow-x:auto;border-bottom:1px solid #dde3f0;flex-shrink:0;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{white-space:nowrap;background:#f4f6fa;border:1.5px solid #dde3f0;border-radius:20px;padding:5px 12px;font-size:12.5px;cursor:pointer;color:#1a2742;font-family:inherit;font-weight:500;transition:all .15s}
+  .chip:hover{background:#1a2742;color:#fff;border-color:#1a2742}
+  .msgs{flex:1;overflow-y:auto;padding:16px 14px 8px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+  .msgs::-webkit-scrollbar{width:4px}
+  .msgs::-webkit-scrollbar-thumb{background:#dde3f0;border-radius:2px}
+  .row{display:flex;gap:9px;animation:up .22s ease both}
+  @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .row.u{flex-direction:row-reverse}
+  .av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
+  .av.b{background:#1a2742}
+  .av.u{background:#c0392b}
+  .bbl{max-width:80%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.65}
+  .bbl.b{background:#fff;border:1px solid #dde3f0;border-top-left-radius:3px;color:#1c2333;box-shadow:0 2px 8px rgba(26,39,66,.06)}
+  .bbl.u{background:#1a2742;color:#fff;border-top-right-radius:3px}
+  .bbl.b h3{font-size:13.5px;font-weight:700;color:#1a2742;margin:10px 0 5px;padding-bottom:3px;border-bottom:2px solid #d4a017;display:inline-block}
+  .bbl.b h3:first-child{margin-top:0}
+  .bbl.b ul,.bbl.b ol{padding-left:18px;margin:5px 0}
+  .bbl.b li{margin-bottom:4px}
+  .bbl.b strong{color:#c0392b}
+  .bbl.b .tag{display:inline-block;background:#f5e6e4;color:#96281b;font-size:11px;font-weight:600;padding:2px 9px;border-radius:10px;margin-bottom:8px}
+  .bbl.b .note{background:#fef9ee;border-left:3px solid #d4a017;padding:7px 10px;border-radius:0 8px 8px 0;font-size:13px;margin-top:8px;color:#5a4200}
+  .bbl.b .step{display:flex;gap:8px;align-items:flex-start;margin:5px 0}
+  .bbl.b .sn{background:#1a2742;color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .bbl.b .src{display:inline-flex;align-items:center;gap:4px;background:#f0f4ff;color:#3730a3;font-size:11px;padding:3px 8px;border-radius:10px;margin-top:10px;border:1px solid #c7d2fe}
+  .typdots{display:flex;gap:4px;padding:6px 2px}
+  .typdots span{width:7px;height:7px;background:#94a3b8;border-radius:50%;animation:b 1.2s infinite}
+  .typdots span:nth-child(2){animation-delay:.18s}
+  .typdots span:nth-child(3){animation-delay:.36s}
+  @keyframes b{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+  .inp-area{padding:10px 14px 14px;background:#fff;border-top:1px solid #dde3f0;display:flex;gap:9px;align-items:flex-end;flex-shrink:0}
+  .inp-wrap{flex:1;background:#f4f6fa;border:1.5px solid #dde3f0;border-radius:22px;padding:8px 14px;display:flex;align-items:flex-end}
+  .inp-wrap:focus-within{border-color:#1a2742}
+  textarea{flex:1;background:none;border:none;outline:none;font-family:inherit;font-size:14px;color:#1c2333;resize:none;max-height:90px;line-height:1.5;overflow-y:auto}
+  textarea::placeholder{color:#94a3b8}
+  .sbtn{width:40px;height:40px;background:#1a2742;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;flex-shrink:0;transition:background .15s;box-shadow:0 2px 8px rgba(26,39,66,.2)}
+  .sbtn:hover{background:#c0392b}
+  .sbtn:disabled{background:#dde3f0;cursor:not-allowed;box-shadow:none}
+  .welcome{background:linear-gradient(135deg,#1a2742,#2e3f67);border-radius:12px;padding:18px;color:#fff;text-align:center;margin-bottom:4px}
+  .welcome h2{font-size:16px;font-weight:700;margin-bottom:6px}
+  .welcome p{font-size:13px;opacity:.85;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hd">
+    <div class="hd-icon">🛡️</div>
+    <div>
+      <div class="hd-t">Trợ lý Hành chính Công an Xã</div>
+      <div class="hd-s"><span class="dot"></span>Hỗ trợ thủ tục • Hướng dẫn giấy tờ • Tra cứu quy trình</div>
+    </div>
+  </div>
+  <div class="chips">
+    <button class="chip" onclick="quick('Đăng ký thường trú')">📋 Thường trú</button>
+    <button class="chip" onclick="quick('Cấp CCCD mới')">🪪 Cấp CCCD</button>
+    <button class="chip" onclick="quick('Xác nhận lý lịch tư pháp')">🔏 Lý lịch tư pháp</button>
+    <button class="chip" onclick="quick('Khai báo tạm trú')">🚗 Tạm trú</button>
+    <button class="chip" onclick="quick('Chứng thực chữ ký')">📝 Chứng thực</button>
+    <button class="chip" onclick="quick('Thủ tục khai sinh')">👶 Khai sinh</button>
+    <button class="chip" onclick="quick('Xóa đăng ký thường trú')">🏠 Xóa thường trú</button>
+  </div>
+  <div class="msgs" id="msgs">
+    <div class="welcome">
+      <h2>Xin chào! Tôi là Trợ lý Hành chính 👋</h2>
+      <p>Tôi hỗ trợ hướng dẫn <strong>thủ tục hành chính tại Công an cấp xã/phường</strong> theo quy định pháp luật Việt Nam hiện hành.<br>Chọn chủ đề bên trên hoặc nhập câu hỏi bên dưới.</p>
+    </div>
+  </div>
+  <div class="inp-area">
+    <div class="inp-wrap">
+      <textarea id="inp" rows="1" placeholder="Hỏi về thủ tục hành chính Công an xã..."
+        onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+    </div>
+    <button class="sbtn" id="sbtn" onclick="send()">➤</button>
+  </div>
+</div>
+
+<script>
+  // ===== THAY BẰNG URL CLOUDFLARE WORKER CỦA BẠN =====
+  const WORKER_URL = "https://patient-darkness-6124.stickdeal.workers.dev/";
+  // ====================================================
+
+  let hist = [], loading = false;
+
+  function resize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 90) + 'px'; }
+  function onKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+  function quick(t) { document.getElementById('inp').value = 'Hướng dẫn thủ tục: ' + t; send(); }
+
+  function addMsg(role, html, isHTML) {
+    const a = document.getElementById('msgs');
+    const r = document.createElement('div');
+    r.className = 'row ' + (role === 'bot' ? '' : 'u');
+    const av = document.createElement('div');
+    av.className = 'av ' + (role === 'bot' ? 'b' : 'u');
+    av.textContent = role === 'bot' ? '🛡️' : '👤';
+    const b = document.createElement('div');
+    b.className = 'bbl ' + (role === 'bot' ? 'b' : 'u');
+    if (isHTML) b.innerHTML = html; else b.textContent = html;
+    r.appendChild(av); r.appendChild(b);
+    a.appendChild(r); a.scrollTop = a.scrollHeight;
+  }
+
+  function showTyping() {
+    const a = document.getElementById('msgs');
+    const r = document.createElement('div');
+    r.className = 'row'; r.id = 'typ';
+    r.innerHTML = '<div class="av b">🛡️</div><div class="bbl b"><div class="typdots"><span></span><span></span><span></span></div></div>';
+    a.appendChild(r); a.scrollTop = a.scrollHeight;
+  }
+
+  async function send() {
+    if (loading) return;
+    const inp = document.getElementById('inp');
+    const txt = inp.value.trim();
+    if (!txt) return;
+    inp.value = ''; inp.style.height = 'auto';
+    addMsg('user', txt, false);
+    hist.push({ role: 'user', content: txt });
+    loading = true;
+    document.getElementById('sbtn').disabled = true;
+    showTyping();
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: hist })
+      });
+      const d = await res.json();
+      document.getElementById('typ')?.remove();
+      const reply = d.content?.[0]?.text || 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.';
+      addMsg('bot', reply, true);
+      hist.push({ role: 'assistant', content: reply });
+      if (hist.length > 20) hist = hist.slice(-20);
+    } catch (e) {
+      document.getElementById('typ')?.remove();
+      addMsg('bot', '⚠️ Lỗi kết nối. Vui lòng thử lại sau.', false);
+    }
+    loading = false;
+    document.getElementById('sbtn').disabled = false;
+  }
+</script>
+</body>
+</html>
